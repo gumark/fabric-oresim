@@ -1,0 +1,10 @@
+.gradle/
+build/
+.tools/
+run/
+out/
+.idea/
+*.iml
+*.ipr
+*.iws
+.freebuff/

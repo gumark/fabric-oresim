@@ -1,0 +1,71 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+// Target versions can be overridden per build, e.g.
+//   gradle build -Pmc=26.2 -Pfapi=0.161.0+26.2
+// Omitting the properties builds for the defaults in gradle.properties.
+def mcVersion = (findProperty('mc') ?: project.minecraft_version).toString()
+def fapiVersion = (findProperty('fapi') ?: project.fabric_api_version).toString()
+def javaRelease = (findProperty('jrelease') ?: '25').toString()
+
+// Sources and resources that differ between Minecraft API generations live in
+// overlay directories: src/mc263 for 26.3, src/mc262 for 26.1/26.2.
+def flavor = mcVersion == '26.3' ? 'mc263' : 'mc262'
+sourceSets.main.java.srcDir("src/${flavor}/java")
+sourceSets.main.resources.srcDir("src/${flavor}/resources")
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+// Name every archive with the mod version and the Minecraft version it
+// targets, e.g. oresim-by-gumark-1.1.0-mc26.3.jar
+
+tasks.withType(AbstractArchiveTask).configureEach {
+    archiveVersion = "${project.mod_version}-mc${mcVersion}"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:${mcVersion}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API (client commands, key bindings, render + lifecycle events)
+    implementation "net.fabricmc.fabric-api:fabric-api:${fapiVersion}"
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "minecraft", mcVersion
+    inputs.property "java", javaRelease
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version, "minecraft": mcVersion, "java": javaRelease
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = Integer.parseInt(javaRelease)
+    it.options.encoding = "UTF-8"
+}
+
+java {
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.toVersion(javaRelease)
+    targetCompatibility = JavaVersion.toVersion(javaRelease)
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archives_base_name}" }
+    }
+}

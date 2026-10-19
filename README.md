@@ -1,4 +1,4 @@
-# OreSim by gumark
+# OreSim
 
 A standalone Fabric mod for **Minecraft 26.x** (26.1.2 – 26.3) that predicts where ores generated
 from the world seed and renders them as colored boxes through walls — no xray
@@ -74,7 +74,7 @@ gradle build -Pmc=26.1.2 -Pfapi=0.155.3+26.1.2
 OreSim was originally part of
 [meteor-rejects](https://github.com/AntiCope/meteor-rejects) (the OreSim module
 and its worldgen port of vanilla's ore feature). This standalone version is a
-port to standalone Fabric for Minecraft 26.3 by gumark.
+port to standalone Fabric for Minecraft 26.3
 
 ## License
 
